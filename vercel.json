@@ -1,0 +1,17 @@
+{
+  "functions": {
+    "src/app/api/**/*.ts": {
+      "maxDuration": 30
+    }
+  },
+  "crons": [
+    {
+      "path": "/api/collect/related",
+      "schedule": "*/5 * * * *"
+    },
+    {
+      "path": "/api/collect/docs", 
+      "schedule": "*/2 * * * *"
+    }
+  ]
+}

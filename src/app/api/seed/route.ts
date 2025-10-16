@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server"
 import { z } from "zod"
+import { supabaseAdmin } from "@/lib/supabase"
 
 // 요청 스키마 검증
 const seedRequestSchema = z.object({
@@ -16,13 +17,45 @@ export async function POST(request: NextRequest) {
     // 요청 데이터 검증
     const validatedData = seedRequestSchema.parse(body)
     
-    // TODO: 실제 데이터베이스 연동
     // 1. keywords 테이블에 시드 키워드 upsert
+    const { data: keywordData, error: keywordError } = await supabaseAdmin
+      .from('keywords')
+      .upsert({
+        term: validatedData.term.trim().toLowerCase(),
+        source: 'seed',
+        depth: 0,
+        status: 'queued'
+      }, {
+        onConflict: 'term'
+      })
+      .select('id')
+      .single()
+
+    if (keywordError) {
+      console.error('키워드 저장 오류:', keywordError)
+      throw new Error('키워드 저장에 실패했습니다.')
+    }
+
+    const keywordId = keywordData.id
+
     // 2. jobs 큐에 'fetch_related' 작업 등록
-    // 3. 자동수집이 활성화된 경우 워커 트리거
-    
-    // 임시 응답 (실제 구현 시 데이터베이스 ID 반환)
-    const keywordId = Math.floor(Math.random() * 1000000)
+    if (validatedData.autoCollect) {
+      const { error: jobError } = await supabaseAdmin
+        .from('jobs')
+        .insert({
+          type: 'fetch_related',
+          payload: {
+            keyword_id: keywordId,
+            target_count: validatedData.targetCount,
+            depth_limit: validatedData.depthLimit
+          }
+        })
+
+      if (jobError) {
+        console.error('작업 큐 등록 오류:', jobError)
+        // 키워드는 저장되었으므로 경고만 로그
+      }
+    }
     
     // 로깅
     console.log("시드 키워드 등록:", {
@@ -66,20 +99,43 @@ export async function POST(request: NextRequest) {
 // GET 메서드로 현재 수집 상태 조회
 export async function GET() {
   try {
-    // TODO: 실제 데이터베이스에서 수집 상태 조회
     // keywords 테이블에서 status별 카운트 조회
-    
-    const mockStatus = {
-      totalKeywords: 0,
-      collectedKeywords: 0,
-      progress: 0,
-      isCollecting: false,
+    const { data: keywordStats, error: keywordError } = await supabaseAdmin
+      .from('keywords')
+      .select('status, count(*)')
+      .group('status')
+
+    if (keywordError) {
+      console.error('키워드 통계 조회 오류:', keywordError)
+      throw new Error('키워드 통계 조회에 실패했습니다.')
+    }
+
+    // 작업 큐에서 진행 중인 작업 확인
+    const { data: activeJobs, error: jobError } = await supabaseAdmin
+      .from('jobs')
+      .select('count(*)')
+      .in('status', ['pending', 'processing'])
+
+    if (jobError) {
+      console.error('작업 큐 조회 오류:', jobError)
+    }
+
+    // 통계 계산
+    const totalKeywords = keywordStats?.reduce((sum, stat) => sum + parseInt(stat.count), 0) || 0
+    const collectedKeywords = keywordStats?.find(stat => stat.status === 'counted_docs')?.count || 0
+    const isCollecting = (activeJobs?.[0]?.count || 0) > 0
+
+    const status = {
+      totalKeywords,
+      collectedKeywords: parseInt(collectedKeywords),
+      progress: totalKeywords > 0 ? Math.round((parseInt(collectedKeywords) / totalKeywords) * 100) : 0,
+      isCollecting,
       lastUpdate: new Date().toISOString(),
     }
     
     return NextResponse.json({
       success: true,
-      data: mockStatus,
+      data: status,
     })
     
   } catch (error) {
