@@ -1,103 +1,167 @@
-import Image from "next/image";
+"use client"
+
+import { useState } from "react"
+import { SeedForm } from "@/components/forms/SeedForm"
+import { ProgressStatus } from "@/components/ProgressStatus"
+import { SeedFormData, CollectionStatus, UIState } from "@/types"
+import { Button } from "@/components/ui/button"
+import { Database, BarChart3, RefreshCw } from "lucide-react"
 
 export default function Home() {
-  return (
-    <div className="font-sans grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20">
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="font-mono list-inside list-decimal text-sm/6 text-center sm:text-left">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] font-mono font-semibold px-1 py-0.5 rounded">
-              src/app/page.tsx
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
-        </ol>
+  const [uiState, setUIState] = useState<UIState>({
+    isLoading: false,
+    error: null,
+    success: null,
+  })
+  
+  const [collectionStatus, setCollectionStatus] = useState<CollectionStatus | null>(null)
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
+  const handleSeedSubmit = async (data: SeedFormData) => {
+    setUIState({ isLoading: true, error: null, success: null })
+    
+    try {
+      // TODO: API 호출 구현
+      const response = await fetch("/api/seed", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(data),
+      })
+
+      if (!response.ok) {
+        throw new Error("시드 키워드 등록에 실패했습니다.")
+      }
+
+      const result = await response.json()
+      
+      setUIState({
+        isLoading: false,
+        error: null,
+        success: "시드 키워드가 성공적으로 등록되었습니다.",
+      })
+
+      // 수집 상태 업데이트 (실제로는 API에서 가져와야 함)
+      setCollectionStatus({
+        totalKeywords: data.targetCount,
+        collectedKeywords: 0,
+        progress: 0,
+        isCollecting: true,
+        lastUpdate: new Date().toISOString(),
+      })
+
+    } catch (error) {
+      setUIState({
+        isLoading: false,
+        error: error instanceof Error ? error.message : "알 수 없는 오류가 발생했습니다.",
+        success: null,
+      })
+    }
+  }
+
+  const handleRefreshStatus = async () => {
+    try {
+      // TODO: 실제 API 호출로 상태 업데이트
+      if (collectionStatus) {
+        setCollectionStatus({
+          ...collectionStatus,
+          collectedKeywords: Math.min(
+            collectionStatus.collectedKeywords + Math.floor(Math.random() * 50),
+            collectionStatus.totalKeywords
+          ),
+          lastUpdate: new Date().toISOString(),
+        })
+      }
+    } catch (error) {
+      console.error("상태 업데이트 실패:", error)
+    }
+  }
+
+  return (
+    <div className="min-h-screen bg-background">
+      <div className="container mx-auto px-4 py-8">
+        {/* 헤더 */}
+        <div className="text-center mb-12">
+          <h1 className="text-4xl font-bold text-foreground mb-4">
+            키워드 자동 수집 시스템
+          </h1>
+          <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+            시드 키워드를 입력하면 연관키워드를 자동으로 수집하고 
+            카페/블로그/웹/뉴스 문서수를 집계하여 황금키워드를 발굴합니다.
+          </p>
         </div>
-      </main>
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
+
+        {/* 메인 콘텐츠 */}
+        <div className="grid grid-cols-1 xl:grid-cols-2 gap-8 max-w-7xl mx-auto">
+          {/* 시드 입력 폼 */}
+          <div className="order-2 xl:order-1">
+            <SeedForm onSubmit={handleSeedSubmit} isLoading={uiState.isLoading} />
+            
+            {/* 상태 메시지 */}
+            {uiState.error && (
+              <div className="mt-4 p-4 bg-destructive/10 border border-destructive/20 rounded-lg animate-in slide-in-from-top-2 duration-300">
+                <p className="text-destructive text-sm">{uiState.error}</p>
+              </div>
+            )}
+            
+            {uiState.success && (
+              <div className="mt-4 p-4 bg-green-50 border border-green-200 rounded-lg animate-in slide-in-from-top-2 duration-300">
+                <p className="text-green-700 text-sm">{uiState.success}</p>
+              </div>
+            )}
+          </div>
+
+          {/* 진행상태 */}
+          <div className="order-1 xl:order-2">
+            <ProgressStatus status={collectionStatus} />
+            
+            {collectionStatus && (
+              <div className="mt-4">
+                <Button
+                  variant="outline"
+                  onClick={handleRefreshStatus}
+                  className="w-full hover:bg-accent transition-colors"
+                >
+                  <RefreshCw className="h-4 w-4 mr-2" />
+                  상태 새로고침
+                </Button>
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* 빠른 액션 */}
+        <div className="mt-16 max-w-4xl mx-auto">
+          <h2 className="text-2xl font-bold text-center mb-8">빠른 액션</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="bg-card border rounded-lg p-6 text-center hover:shadow-md transition-all duration-200 hover:scale-[1.02] group">
+              <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-primary/10 flex items-center justify-center group-hover:bg-primary/20 transition-colors">
+                <Database className="h-8 w-8 text-primary" />
+              </div>
+              <h3 className="text-lg font-semibold mb-2">데이터 보기</h3>
+              <p className="text-muted-foreground mb-4 leading-relaxed">
+                수집된 키워드 데이터를 확인하고 분석하세요.
+              </p>
+              <Button variant="outline" className="w-full hover:bg-primary hover:text-primary-foreground transition-colors">
+                데이터 페이지로 이동
+              </Button>
+            </div>
+            
+            <div className="bg-card border rounded-lg p-6 text-center hover:shadow-md transition-all duration-200 hover:scale-[1.02] group">
+              <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-primary/10 flex items-center justify-center group-hover:bg-primary/20 transition-colors">
+                <BarChart3 className="h-8 w-8 text-primary" />
+              </div>
+              <h3 className="text-lg font-semibold mb-2">인사이트</h3>
+              <p className="text-muted-foreground mb-4 leading-relaxed">
+                키워드 분석 리포트와 인사이트를 확인하세요.
+              </p>
+              <Button variant="outline" className="w-full hover:bg-primary hover:text-primary-foreground transition-colors">
+                인사이트 페이지로 이동
+              </Button>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
-  );
+  )
 }
