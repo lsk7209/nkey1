@@ -29,7 +29,7 @@ NAVER_OPENAPI_KEYS=[{"label":"OpenAPI키1","clientId":"CjG3EpGT1B0Hg59qS4Yg","cl
 
 #### 🔑 서버 토큰
 ```
-SERVER_TOKEN=your_secure_server_token_here
+SERVER_TOKEN=377fc2a9edd66fe5365652c8cad23af522897ba020c68bb068f954da72f4068e
 ```
 
 ### 3단계: 환경 적용
