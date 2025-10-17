@@ -4,7 +4,7 @@ import { useState, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 
 export default function DebugPage() {
-  const [healthStatus, setHealthStatus] = useState<any>(null)
+  const [healthStatus, setHealthStatus] = useState<Record<string, unknown> | null>(null)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
 

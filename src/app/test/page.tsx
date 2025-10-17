@@ -1,3 +1,5 @@
+import Link from "next/link"
+
 export default function TestPage() {
   return (
     <div className="container mx-auto p-8">
@@ -13,7 +15,7 @@ export default function TestPage() {
         <div className="p-4 bg-blue-100 rounded">
           <h2 className="font-semibold text-blue-800">🔗 링크 테스트</h2>
           <p className="text-blue-700">
-            <a href="/" className="underline">홈으로 돌아가기</a>
+            <Link href="/" className="underline">홈으로 돌아가기</Link>
           </p>
         </div>
       </div>
