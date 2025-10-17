@@ -123,7 +123,7 @@ export default function DataPage() {
                 onChange={(e) => setHideLowSv(e.target.checked)}
                 className="rounded"
               />
-              <Label htmlFor="hideLowSv">낮은 검색수 숨기기 (SV < 500)</Label>
+              <Label htmlFor="hideLowSv">낮은 검색수 숨기기 (SV &lt; 500)</Label>
             </div>
             
             <div className="flex items-center space-x-2">
