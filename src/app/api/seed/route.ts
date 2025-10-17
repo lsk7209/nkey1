@@ -80,7 +80,7 @@ export async function POST(request: NextRequest) {
         {
           success: false,
           message: "입력 데이터가 올바르지 않습니다.",
-          errors: error.errors,
+          errors: error.issues,
         },
         { status: 400 }
       )
