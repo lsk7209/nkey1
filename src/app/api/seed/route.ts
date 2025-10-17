@@ -100,20 +100,26 @@ export async function POST(request: NextRequest) {
 export async function GET() {
   try {
     // keywords 테이블에서 status별 카운트 조회
-    const { data: keywordStats, error: keywordError } = await supabaseAdmin
+    const { data: allKeywords, error: keywordError } = await supabaseAdmin
       .from('keywords')
-      .select('status, count(*)')
-      .group('status')
+      .select('status')
 
     if (keywordError) {
       console.error('키워드 통계 조회 오류:', keywordError)
       throw new Error('키워드 통계 조회에 실패했습니다.')
     }
 
+    // 클라이언트 사이드에서 그룹핑
+    const keywordStats = allKeywords?.reduce((acc, keyword) => {
+      const status = keyword.status
+      acc[status] = (acc[status] || 0) + 1
+      return acc
+    }, {} as Record<string, number>)
+
     // 작업 큐에서 진행 중인 작업 확인
-    const { data: activeJobs, error: jobError } = await supabaseAdmin
+    const { data: allJobs, error: jobError } = await supabaseAdmin
       .from('jobs')
-      .select('count(*)')
+      .select('status')
       .in('status', ['pending', 'processing'])
 
     if (jobError) {
@@ -121,9 +127,9 @@ export async function GET() {
     }
 
     // 통계 계산
-    const totalKeywords = keywordStats?.reduce((sum, stat) => sum + parseInt(stat.count), 0) || 0
-    const collectedKeywords = keywordStats?.find(stat => stat.status === 'counted_docs')?.count || 0
-    const isCollecting = (activeJobs?.[0]?.count || 0) > 0
+    const totalKeywords = Object.values(keywordStats || {}).reduce((sum, count) => sum + count, 0)
+    const collectedKeywords = keywordStats?.['counted_docs'] || 0
+    const isCollecting = (allJobs?.length || 0) > 0
 
     const status = {
       totalKeywords,
