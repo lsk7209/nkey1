@@ -133,8 +133,8 @@ export async function GET() {
 
     const status = {
       totalKeywords,
-      collectedKeywords: parseInt(collectedKeywords),
-      progress: totalKeywords > 0 ? Math.round((parseInt(collectedKeywords) / totalKeywords) * 100) : 0,
+      collectedKeywords: Number(collectedKeywords),
+      progress: totalKeywords > 0 ? Math.round((Number(collectedKeywords) / totalKeywords) * 100) : 0,
       isCollecting,
       lastUpdate: new Date().toISOString(),
     }
