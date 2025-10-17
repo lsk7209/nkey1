@@ -105,7 +105,7 @@ export class NaverSearchAdClient {
     return crypto.createHmac('sha256', secret).update(message).digest('base64')
   }
 
-  private async makeRequest(uri: string, params: Record<string, string> = {}): Promise<{ keywordList: Array<{ relKeyword: string; monthlyPcQcCnt: number; monthlyMobileQcCnt: number; monthlyAvePcCtr: number; monthlyAveMobileCtr: number; plAvgDepth: number; compIdx: string }> }> {
+  private async makeRequest(uri: string, params: Record<string, string> = {}): Promise<{ keywordList: Array<{ relKeyword: string; monthlyPcQcCnt: string; monthlyMobileQcCnt: string; monthlyAvePcClkCnt: string; monthlyAveMobileClkCnt: string; monthlyAvePcCtr: string; monthlyAveMobileCtr: string; plAvgDepth: string; compIdx: string }> }> {
     const key = selectAvailableSearchAdKey()
     if (!key) {
       throw new Error('사용 가능한 SearchAd 키가 없습니다.')

@@ -6,6 +6,9 @@ export async function GET() {
       supabaseUrl: !!process.env.NEXT_PUBLIC_SUPABASE_URL,
       supabaseAnonKey: !!process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
       supabaseServiceKey: !!process.env.SUPABASE_SERVICE_ROLE_KEY,
+      naverOpenApiKeys: !!process.env.NAVER_OPENAPI_KEYS,
+      naverSearchAdKeys: !!process.env.NAVER_SEARCHAD_KEYS,
+      serverToken: !!process.env.SERVER_TOKEN,
     }
 
     const allEnvSet = Object.values(envStatus).every(Boolean)
