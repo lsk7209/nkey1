@@ -3,7 +3,7 @@
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { cn } from "@/lib/utils"
-import { Search, Database, BarChart3, Settings } from "lucide-react"
+import { Search, Database, BarChart3, Settings, Key } from "lucide-react"
 
 const navigation = [
   {
@@ -20,6 +20,11 @@ const navigation = [
     name: "인사이트",
     href: "/insights",
     icon: BarChart3,
+  },
+  {
+    name: "API 키",
+    href: "/admin/keys",
+    icon: Key,
   },
   {
     name: "진단",
