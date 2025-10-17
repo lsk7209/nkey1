@@ -59,7 +59,7 @@ export async function GET(request: NextRequest) {
     // 문서수 통계 조회
     const { data: docStats, error: docError } = await supabaseAdmin
       .from('doc_counts')
-      .select('count(*)')
+      .select('*')
       .gte('date', new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0]) // 최근 7일
 
     if (docError) {
@@ -152,7 +152,7 @@ export async function GET(request: NextRequest) {
       keywords: keywordStatus,
       jobs: jobStatus,
       doc_counts: {
-        recent_7days: docStats?.[0]?.count || 0
+        recent_7days: docStats?.length || 0
       },
       metrics: {
         rate_429: rate429,
