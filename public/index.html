@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>키워드 자동 수집 시스템</title>
+</head>
+<body>
+    <h1>키워드 자동 수집 시스템</h1>
+    <p>시드 키워드로부터 연관키워드를 자동 수집하고 문서수를 집계하여 황금키워드를 발굴하세요</p>
+    
+    <div style="margin-top: 20px;">
+        <h2>테스트 링크</h2>
+        <ul>
+            <li><a href="/simple">Simple Page</a></li>
+            <li><a href="/test">Test Page</a></li>
+            <li><a href="/debug">Debug Page</a></li>
+            <li><a href="/api/health">Health API</a></li>
+        </ul>
+    </div>
+    
+    <div style="margin-top: 20px; padding: 10px; background-color: #f0f0f0;">
+        <p><strong>현재 시간:</strong> <span id="time"></span></p>
+        <p><strong>정적 파일 테스트:</strong> 이 페이지가 보인다면 Vercel이 정적 파일을 서빙할 수 있습니다.</p>
+    </div>
+
+    <script>
+        document.getElementById('time').textContent = new Date().toISOString();
+    </script>
+</body>
+</html>
