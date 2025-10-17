@@ -3,7 +3,7 @@
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { cn } from "@/lib/utils"
-import { Search, Database, BarChart3, Settings, Key } from "lucide-react"
+import { Search, Database, BarChart3, Settings, Key, TestTube } from "lucide-react"
 
 const navigation = [
   {
@@ -30,6 +30,11 @@ const navigation = [
     name: "진단",
     href: "/debug",
     icon: Settings,
+  },
+  {
+    name: "워커 테스트",
+    href: "/test-worker",
+    icon: TestTube,
   },
 ]
 
