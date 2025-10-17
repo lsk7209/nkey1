@@ -153,11 +153,13 @@ export class NaverSearchAdClient {
   async getRelatedKeywords(hintKeywords: string[]): Promise<{
     keywordList: Array<{
       relKeyword: string
-      monthlyPcQcCnt: number
-      monthlyMobileQcCnt: number
-      monthlyAvePcCtr: number
-      monthlyAveMobileCtr: number
-      plAvgDepth: number
+      monthlyPcQcCnt: string
+      monthlyMobileQcCnt: string
+      monthlyAvePcClkCnt: string
+      monthlyAveMobileClkCnt: string
+      monthlyAvePcCtr: string
+      monthlyAveMobileCtr: string
+      plAvgDepth: string
       compIdx: string
     }>
   }> {
