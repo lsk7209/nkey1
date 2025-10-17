@@ -192,7 +192,6 @@ export function resetDailyUsage(): void {
   ]
   
   allKeys.forEach(label => {
-    const usage = getKeyUsage(label)
     updateKeyUsage(label, { 
       usedToday: 0,
       lastError: undefined

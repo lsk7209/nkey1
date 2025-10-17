@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react"
 import { Button } from "@/components/ui/button"
-import { getAllKeyStatus } from "@/lib/api-keys"
+// import { getAllKeyStatus } from "@/lib/api-keys" // 사용하지 않음
 import { RefreshCw, AlertCircle, CheckCircle, Clock, Zap } from "lucide-react"
 
 interface KeyStatus {
@@ -57,7 +57,7 @@ export default function APIKeysPage() {
       } else {
         setError(result.message || 'API 키 상태를 불러오는데 실패했습니다.')
       }
-    } catch (err) {
+    } catch {
       setError('서버와의 통신 중 오류가 발생했습니다.')
     } finally {
       setLoading(false)
@@ -72,7 +72,7 @@ export default function APIKeysPage() {
     return () => clearInterval(interval)
   }, [])
 
-  const getStatusIcon = (key: any) => {
+  const getStatusIcon = (key: { usage: { cooldownUntil?: Date; usedToday: number; windowTokens: number }; daily: number }) => {
     const now = new Date()
     const isCooldown = key.usage.cooldownUntil && new Date(key.usage.cooldownUntil) > now
     const isQuotaExceeded = key.usage.usedToday >= key.daily
@@ -89,7 +89,7 @@ export default function APIKeysPage() {
     }
   }
 
-  const getStatusText = (key: any) => {
+  const getStatusText = (key: { usage: { cooldownUntil?: Date; usedToday: number; windowTokens: number }; daily: number }) => {
     const now = new Date()
     const isCooldown = key.usage.cooldownUntil && new Date(key.usage.cooldownUntil) > now
     const isQuotaExceeded = key.usage.usedToday >= key.daily

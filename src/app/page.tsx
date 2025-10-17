@@ -37,7 +37,7 @@ export default function Home() {
       } else {
         setUIState({ isLoading: false, error: result.message || '키워드 등록에 실패했습니다.', success: null })
       }
-    } catch (error) {
+    } catch {
       setUIState({ 
         isLoading: false, 
         error: '서버와의 통신 중 오류가 발생했습니다.', 

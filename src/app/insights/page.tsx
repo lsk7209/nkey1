@@ -23,7 +23,7 @@ export default function InsightsPage() {
       } else {
         setError(result.message || '키워드 데이터를 불러오는데 실패했습니다.')
       }
-    } catch (err) {
+    } catch {
       setError('서버와의 통신 중 오류가 발생했습니다.')
     } finally {
       setLoading(false)

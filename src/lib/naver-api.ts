@@ -4,14 +4,12 @@ import {
   selectAvailableOpenAPIKey, 
   selectAvailableSearchAdKey,
   recordKeyUsage,
-  setKeyCooldown,
-  type OpenAPIKey,
-  type SearchAdKey
+  setKeyCooldown
 } from './api-keys'
 
 // 네이버 오픈API 클라이언트
 export class NaverOpenAPIClient {
-  private async makeRequest(endpoint: string, params: Record<string, string>): Promise<any> {
+  private async makeRequest(endpoint: string, params: Record<string, string>): Promise<{ total: number }> {
     const key = selectAvailableOpenAPIKey()
     if (!key) {
       throw new Error('사용 가능한 OpenAPI 키가 없습니다.')
@@ -106,7 +104,7 @@ export class NaverSearchAdClient {
     return crypto.createHmac('sha256', secret).update(message).digest('base64')
   }
 
-  private async makeRequest(uri: string, params: Record<string, any> = {}): Promise<any> {
+  private async makeRequest(uri: string, params: Record<string, string> = {}): Promise<{ keywordList: Array<{ relKeyword: string; monthlyPcQcCnt: number; monthlyMobileQcCnt: number; plAvgDepth: string; compIdx: string }> }> {
     const key = selectAvailableSearchAdKey()
     if (!key) {
       throw new Error('사용 가능한 SearchAd 키가 없습니다.')

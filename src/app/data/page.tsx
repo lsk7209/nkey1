@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useCallback } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -15,7 +15,7 @@ export default function DataPage() {
   const [hideLowSv, setHideLowSv] = useState(true)
   const [hideZeroDocs, setHideZeroDocs] = useState(true)
 
-  const fetchKeywords = async () => {
+  const fetchKeywords = useCallback(async () => {
     setLoading(true)
     setError(null)
     
@@ -35,16 +35,16 @@ export default function DataPage() {
       } else {
         setError(result.message || '키워드 데이터를 불러오는데 실패했습니다.')
       }
-    } catch (err) {
+    } catch {
       setError('서버와의 통신 중 오류가 발생했습니다.')
     } finally {
       setLoading(false)
     }
-  }
+  }, [searchTerm, hideLowSv, hideZeroDocs])
 
   useEffect(() => {
     fetchKeywords()
-  }, [searchTerm, hideLowSv, hideZeroDocs])
+  }, [fetchKeywords])
 
   const exportToCSV = () => {
     if (keywords.length === 0) return
