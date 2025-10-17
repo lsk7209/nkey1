@@ -17,12 +17,12 @@ NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key
 SUPABASE_SERVICE_ROLE_KEY=your-service-role-key
 ```
 
-#### 🔑 네이버 검색광고 API 키 (5개)
+#### 🔑 네이버 검색광고 API 키 (5개) - 한 줄로 복사
 ```
 NAVER_SEARCHAD_KEYS=[{"label":"검색광고API키1","accessLicense":"0100000000d027bb5287da074c48fc79503e97ae8e4bb0e7e928b39108e0b4dd6ce3950b7f","secret":"AQAAAADQJ7tSh9oHTEj8eVA+l66OGm0FwBl/Ejg+WP/5GntSew==","customerId":"4129627","qps":0.5,"daily":8000},{"label":"검색광고API키2","accessLicense":"0100000000cc9487ea097be3b003d1634f76af9d829f9add05a89bfff3b70502076049b218","secret":"AQAAAADMlIfqCXvjsAPRY092r52CKoSQ0mjfgDr9xnHtAg1j1w==","customerId":"588691","qps":0.5,"daily":8000},{"label":"검색광고API키3","accessLicense":"01000000004df6f7cf20064146e5567633fb8dee0ddb315f0c0c46ffb79b4084db618b53ae","secret":"AQAAAABN9vfPIAZBRuVWdjP7je4NQviMuG1aQc4wbCGVofNGFQ==","customerId":"3834222","qps":0.5,"daily":8000},{"label":"검색광고API키4","accessLicense":"01000000007c872e3ad6cc952fc6985cb75ba9bac49bd47118d73c1da388320f2484a5fc34","secret":"AQAAAAB8hy461syVL8aYXLdbqbrEeM8U8CCzJJ7dtIXx/Qei1Q==","customerId":"3279649","qps":0.5,"daily":8000},{"label":"검색광고API키5","accessLicense":"01000000002f4619842bbd6c8133ee464acf7affed98e8b0a30253f34e4b2359beeb56ec6a","secret":"AQAAAAAvRhmEK71sgTPuRkrPev/t5wskFLEKPQT7H8bwOrhnrQ==","customerId":"4136805","qps":0.5,"daily":8000}]
 ```
 
-#### 🔑 네이버 오픈API 키 (9개)
+#### 🔑 네이버 오픈API 키 (9개) - 한 줄로 복사
 ```
 NAVER_OPENAPI_KEYS=[{"label":"OpenAPI키1","clientId":"CjG3EpGT1B0Hg59qS4Yg","clientSecret":"SXc9V2Ng68","qps":3,"daily":20000},{"label":"OpenAPI키2","clientId":"Ns2WCljKopkmKzItuXjs","clientSecret":"fNhWPvyrhh","qps":3,"daily":20000},{"label":"OpenAPI키3","clientId":"RHpI5bN3s4htxOfhjoiC","clientSecret":"mh27e9fZv5","qps":3,"daily":20000},{"label":"OpenAPI키4","clientId":"SpZqzhEXpLQ_uH5E2NvJ","clientSecret":"ZfasrqGq0M","qps":3,"daily":20000},{"label":"OpenAPI키5","clientId":"pUv4iAjPjTE5dBhBbFpS","clientSecret":"u989uWV8hL","qps":3,"daily":20000},{"label":"OpenAPI키6","clientId":"zh3WcdJSwhgGsAR3fi81","clientSecret":"_2NG7QKIxO","qps":3,"daily":20000},{"label":"OpenAPI키7","clientId":"F5VgcA9q3sr_3jTQKDEE","clientSecret":"feY3IVpZDS","qps":3,"daily":20000},{"label":"OpenAPI키8","clientId":"2KhNfgFOPYztSpU09mvm","clientSecret":"4bQY9ysJKe","qps":3,"daily":20000},{"label":"OpenAPI키9","clientId":"EcFJwVeEe5SULWuLP5sj","clientSecret":"b_QiA5tugl","qps":3,"daily":20000}]
 ```
