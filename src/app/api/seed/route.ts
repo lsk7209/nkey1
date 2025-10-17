@@ -12,6 +12,17 @@ const seedRequestSchema = z.object({
 
 export async function POST(request: NextRequest) {
   try {
+    // 환경변수 검증
+    if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.SUPABASE_SERVICE_ROLE_KEY) {
+      return NextResponse.json(
+        {
+          success: false,
+          message: "환경변수가 설정되지 않았습니다. 관리자에게 문의하세요.",
+        },
+        { status: 500 }
+      )
+    }
+
     const body = await request.json()
     
     // 요청 데이터 검증
@@ -99,6 +110,17 @@ export async function POST(request: NextRequest) {
 // GET 메서드로 현재 수집 상태 조회
 export async function GET() {
   try {
+    // 환경변수 검증
+    if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.SUPABASE_SERVICE_ROLE_KEY) {
+      return NextResponse.json(
+        {
+          success: false,
+          message: "환경변수가 설정되지 않았습니다. 관리자에게 문의하세요.",
+        },
+        { status: 500 }
+      )
+    }
+
     // keywords 테이블에서 status별 카운트 조회
     const { data: allKeywords, error: keywordError } = await supabaseAdmin
       .from('keywords')
