@@ -71,14 +71,21 @@ SERVER_TOKEN=your_secure_server_token
 
 ## 5. Cron Jobs 설정
 
-Vercel Pro 플랜에서만 사용 가능한 기능입니다.
+### Hobby 플랜 (무료)
+하루에 한 번만 실행되는 cron job만 지원합니다.
 
-1. Vercel 대시보드 → 프로젝트 → Settings → Functions
-2. Cron Jobs 섹션에서 다음 작업들 설정:
-   - **Path**: `/api/collect/related`
-   - **Schedule**: `*/5 * * * *` (5분마다)
-   - **Path**: `/api/collect/docs`
-   - **Schedule**: `*/2 * * * *` (2분마다)
+현재 설정:
+- **Path**: `/api/collect/related`
+- **Schedule**: `0 0 * * *` (매일 자정)
+- **Path**: `/api/collect/docs`
+- **Schedule**: `0 6 * * *` (매일 오전 6시)
+
+### Pro 플랜 (유료)
+더 자주 실행되는 cron job을 사용하려면 Pro 플랜으로 업그레이드하세요:
+- **Path**: `/api/collect/related`
+- **Schedule**: `*/5 * * * *` (5분마다)
+- **Path**: `/api/collect/docs`
+- **Schedule**: `*/2 * * * *` (2분마다)
 
 ## 6. 배포 확인
 
