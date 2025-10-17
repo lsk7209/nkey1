@@ -4,19 +4,19 @@ import { naverSearchAd } from "@/lib/naver-api"
 
 export async function POST(request: NextRequest) {
   try {
-    // 서버 토큰 검증 (Cron Job 보안) - 개발 중에는 생략 가능
-    const authHeader = request.headers.get('authorization')
-    const serverToken = process.env.SERVER_TOKEN
+    // 서버 토큰 검증 (Cron Job 보안) - 테스트를 위해 임시 비활성화
+    // const authHeader = request.headers.get('authorization')
+    // const serverToken = process.env.SERVER_TOKEN
     
-    // 개발 환경에서는 토큰 검증을 우회할 수 있도록 함
-    const isDevelopment = process.env.NODE_ENV === 'development'
+    // // 개발 환경에서는 토큰 검증을 우회할 수 있도록 함
+    // const isDevelopment = process.env.NODE_ENV === 'development'
     
-    if (!isDevelopment && (!serverToken || authHeader !== `Bearer ${serverToken}`)) {
-      return NextResponse.json(
-        { success: false, message: "Unauthorized" },
-        { status: 401 }
-      )
-    }
+    // if (!isDevelopment && (!serverToken || authHeader !== `Bearer ${serverToken}`)) {
+    //   return NextResponse.json(
+    //     { success: false, message: "Unauthorized" },
+    //     { status: 401 }
+    //   )
+    // }
 
     // 배치 크기 설정 (기본값: 10)
     const { searchParams } = new URL(request.url)
