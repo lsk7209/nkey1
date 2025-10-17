@@ -33,7 +33,7 @@ export default function Home() {
         throw new Error("시드 키워드 등록에 실패했습니다.")
       }
 
-      const result = await response.json()
+      await response.json()
       
       setUIState({
         isLoading: false,

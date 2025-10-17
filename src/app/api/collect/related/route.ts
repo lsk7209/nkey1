@@ -55,7 +55,7 @@ export async function POST(request: NextRequest) {
           })
           .eq('id', job.id)
 
-        const { keyword_id, target_count, depth_limit } = job.payload
+        const { keyword_id, target_count } = job.payload
 
         // 키워드 정보 조회
         const { data: keyword, error: keywordError } = await supabaseAdmin
