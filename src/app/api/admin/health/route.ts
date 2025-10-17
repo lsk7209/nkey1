@@ -25,20 +25,32 @@ export async function GET(request: NextRequest) {
     }
 
     // 키워드 통계 조회
-    const { data: keywordStats, error: keywordError } = await supabaseAdmin
+    const { data: allKeywords, error: keywordError } = await supabaseAdmin
       .from('keywords')
-      .select('status, count(*)')
-      .group('status')
+      .select('status')
+
+    // 클라이언트 사이드에서 그룹핑
+    const keywordStats = allKeywords?.reduce((acc, keyword) => {
+      const status = keyword.status
+      acc[status] = (acc[status] || 0) + 1
+      return acc
+    }, {} as Record<string, number>)
 
     if (keywordError) {
       console.error('키워드 통계 조회 오류:', keywordError)
     }
 
     // 작업 큐 상태 조회
-    const { data: jobStats, error: jobError } = await supabaseAdmin
+    const { data: allJobs, error: jobError } = await supabaseAdmin
       .from('jobs')
-      .select('status, count(*)')
-      .group('status')
+      .select('status')
+
+    // 클라이언트 사이드에서 그룹핑
+    const jobStats = allJobs?.reduce((acc, job) => {
+      const status = job.status
+      acc[status] = (acc[status] || 0) + 1
+      return acc
+    }, {} as Record<string, number>)
 
     if (jobError) {
       console.error('작업 큐 통계 조회 오류:', jobError)
@@ -73,20 +85,20 @@ export async function GET(request: NextRequest) {
 
     // 키워드 상태 분석
     const keywordStatus = {
-      total: keywordStats?.reduce((sum, stat) => sum + parseInt(stat.count), 0) || 0,
-      queued: keywordStats?.find(stat => stat.status === 'queued')?.count || 0,
-      fetched_rel: keywordStats?.find(stat => stat.status === 'fetched_rel')?.count || 0,
-      counted_docs: keywordStats?.find(stat => stat.status === 'counted_docs')?.count || 0,
-      error: keywordStats?.find(stat => stat.status === 'error')?.count || 0
+      total: Object.values(keywordStats || {}).reduce((sum, count) => sum + count, 0),
+      queued: keywordStats?.['queued'] || 0,
+      fetched_rel: keywordStats?.['fetched_rel'] || 0,
+      counted_docs: keywordStats?.['counted_docs'] || 0,
+      error: keywordStats?.['error'] || 0
     }
 
     // 작업 큐 상태 분석
     const jobStatus = {
-      total: jobStats?.reduce((sum, stat) => sum + parseInt(stat.count), 0) || 0,
-      pending: jobStats?.find(stat => stat.status === 'pending')?.count || 0,
-      processing: jobStats?.find(stat => stat.status === 'processing')?.count || 0,
-      completed: jobStats?.find(stat => stat.status === 'completed')?.count || 0,
-      failed: jobStats?.find(stat => stat.status === 'failed')?.count || 0
+      total: Object.values(jobStats || {}).reduce((sum, count) => sum + count, 0),
+      pending: jobStats?.['pending'] || 0,
+      processing: jobStats?.['processing'] || 0,
+      completed: jobStats?.['completed'] || 0,
+      failed: jobStats?.['failed'] || 0
     }
 
     // 시스템 상태 계산
