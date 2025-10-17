@@ -73,6 +73,14 @@ export function selectAvailableOpenAPIKey(): OpenAPIKey | null {
 
   const now = new Date()
   
+  // 토큰 버킷 초기화 (첫 실행 시)
+  keys.forEach(key => {
+    const usage = getKeyUsage(key.label)
+    if (usage.windowTokens === 0) {
+      updateKeyUsage(key.label, { windowTokens: key.qps * 2 })
+    }
+  })
+  
   // 사용 가능한 키 필터링
   const availableKeys = keys.filter(key => {
     const usage = getKeyUsage(key.label)
@@ -118,6 +126,14 @@ export function selectAvailableSearchAdKey(): SearchAdKey | null {
   if (keys.length === 0) return null
 
   const now = new Date()
+  
+  // 토큰 버킷 초기화 (첫 실행 시)
+  keys.forEach(key => {
+    const usage = getKeyUsage(key.label)
+    if (usage.windowTokens === 0) {
+      updateKeyUsage(key.label, { windowTokens: key.qps * 2 })
+    }
+  })
   
   // 사용 가능한 키 필터링
   const availableKeys = keys.filter(key => {
