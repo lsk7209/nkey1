@@ -13,18 +13,6 @@ export async function GET(request: NextRequest) {
     const sort = searchParams.get('sort') || 'cafe_total:asc,sv_total:desc'
     const q = searchParams.get('q') // 검색어
     
-    // 필터 조건
-    const filters = []
-    if (hideLowSv) {
-      filters.push('sv_total >= 500')
-    }
-    if (hideZeroDocs) {
-      filters.push('(cafe_total + blog_total + web_total + news_total) > 0')
-    }
-    if (q) {
-      filters.push(`keyword ILIKE '%${q}%'`)
-    }
-    
     // 정렬 파라미터 파싱
     const sortParts = sort.split(',')
     const orderBy = sortParts.map(part => {
@@ -47,9 +35,15 @@ export async function GET(request: NextRequest) {
       .limit(pageSize)
     
     // 필터 적용
-    filters.forEach(filter => {
-      query = query.filter('', filter)
-    })
+    if (hideLowSv) {
+      query = query.gte('sv_total', 500)
+    }
+    if (hideZeroDocs) {
+      query = query.gt('cafe_total', 0)
+    }
+    if (q) {
+      query = query.ilike('keyword', `%${q}%`)
+    }
     
     // 정렬 적용
     finalOrderBy.forEach(({ column, ascending }) => {
