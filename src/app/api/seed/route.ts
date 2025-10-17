@@ -17,7 +17,18 @@ export async function POST(request: NextRequest) {
       return NextResponse.json(
         {
           success: false,
-          message: "환경변수가 설정되지 않았습니다. 관리자에게 문의하세요.",
+          message: "Supabase 환경변수가 설정되지 않았습니다. 관리자에게 문의하세요.",
+        },
+        { status: 500 }
+      )
+    }
+
+    // 네이버 API 키 검증
+    if (!process.env.NAVER_OPENAPI_KEYS || !process.env.NAVER_SEARCHAD_KEYS) {
+      return NextResponse.json(
+        {
+          success: false,
+          message: "네이버 API 키가 설정되지 않았습니다. 관리자에게 문의하세요.",
         },
         { status: 500 }
       )
@@ -115,7 +126,18 @@ export async function GET() {
       return NextResponse.json(
         {
           success: false,
-          message: "환경변수가 설정되지 않았습니다. 관리자에게 문의하세요.",
+          message: "Supabase 환경변수가 설정되지 않았습니다. 관리자에게 문의하세요.",
+        },
+        { status: 500 }
+      )
+    }
+
+    // 네이버 API 키 검증
+    if (!process.env.NAVER_OPENAPI_KEYS || !process.env.NAVER_SEARCHAD_KEYS) {
+      return NextResponse.json(
+        {
+          success: false,
+          message: "네이버 API 키가 설정되지 않았습니다. 관리자에게 문의하세요.",
         },
         { status: 500 }
       )
