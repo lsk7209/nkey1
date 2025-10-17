@@ -99,6 +99,7 @@ export class NaverOpenAPIClient {
 // 네이버 검색광고 API 클라이언트
 export class NaverSearchAdClient {
   private generateSignature(secret: string, timestamp: string, method: string, uri: string): string {
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
     const crypto = require('crypto')
     const message = `${timestamp}.${method}.${uri}`
     return crypto.createHmac('sha256', secret).update(message).digest('base64')

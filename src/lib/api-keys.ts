@@ -161,8 +161,6 @@ export function selectAvailableSearchAdKey(): SearchAdKey | null {
 
 // 토큰 버킷 리필 (초당 실행)
 export function refillTokenBuckets(): void {
-  const now = new Date()
-  
   // OpenAPI 키 토큰 리필
   parseOpenAPIKeys().forEach(key => {
     const usage = getKeyUsage(key.label)
