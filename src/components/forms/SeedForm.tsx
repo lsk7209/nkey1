@@ -13,9 +13,9 @@ import { Search, Settings, Play } from "lucide-react"
 
 const seedFormSchema = z.object({
   term: z.string().min(1, "키워드를 입력해주세요").max(100, "키워드는 100자 이하로 입력해주세요"),
-  autoCollect: z.boolean().default(true),
-  targetCount: z.number().min(100, "최소 100개 이상").max(10000, "최대 10,000개까지").default(1000),
-  depthLimit: z.number().min(1, "최소 1단계").max(5, "최대 5단계까지").default(3),
+  autoCollect: z.boolean(),
+  targetCount: z.number().min(100, "최소 100개 이상").max(10000, "최대 10,000개까지"),
+  depthLimit: z.number().min(1, "최소 1단계").max(5, "최대 5단계까지"),
 })
 
 type SeedFormValues = z.infer<typeof seedFormSchema>
