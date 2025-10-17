@@ -12,8 +12,18 @@ const seedRequestSchema = z.object({
 
 export async function POST(request: NextRequest) {
   try {
+    console.log('POST /api/seed - 시작')
+    
     // 환경변수 검증
-    if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.SUPABASE_SERVICE_ROLE_KEY) {
+    const supabaseUrl = !!process.env.NEXT_PUBLIC_SUPABASE_URL
+    const supabaseKey = !!process.env.SUPABASE_SERVICE_ROLE_KEY
+    const naverOpenApi = !!process.env.NAVER_OPENAPI_KEYS
+    const naverSearchAd = !!process.env.NAVER_SEARCHAD_KEYS
+    
+    console.log('환경변수 상태:', { supabaseUrl, supabaseKey, naverOpenApi, naverSearchAd })
+    
+    if (!supabaseUrl || !supabaseKey) {
+      console.log('Supabase 환경변수 누락')
       return NextResponse.json(
         {
           success: false,
@@ -23,8 +33,8 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // 네이버 API 키 검증
-    if (!process.env.NAVER_OPENAPI_KEYS || !process.env.NAVER_SEARCHAD_KEYS) {
+    if (!naverOpenApi || !naverSearchAd) {
+      console.log('네이버 API 키 누락')
       return NextResponse.json(
         {
           success: false,
@@ -96,8 +106,12 @@ export async function POST(request: NextRequest) {
     
   } catch (error) {
     console.error("시드 키워드 등록 오류:", error)
+    console.error("오류 타입:", typeof error)
+    console.error("오류 메시지:", error instanceof Error ? error.message : 'Unknown error')
+    console.error("오류 스택:", error instanceof Error ? error.stack : 'No stack')
     
     if (error instanceof z.ZodError) {
+      console.log("Zod 검증 오류:", error.issues)
       return NextResponse.json(
         {
           success: false,
@@ -112,6 +126,7 @@ export async function POST(request: NextRequest) {
       {
         success: false,
         message: "서버 오류가 발생했습니다.",
+        error: error instanceof Error ? error.message : 'Unknown error',
       },
       { status: 500 }
     )
