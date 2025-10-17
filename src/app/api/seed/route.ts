@@ -50,22 +50,51 @@ export async function POST(request: NextRequest) {
     const validatedData = seedRequestSchema.parse(body)
     
     // 1. keywords 테이블에 시드 키워드 upsert
-    const { data: keywordData, error: keywordError } = await supabaseAdmin
+    const normalizedTerm = validatedData.term.trim().toLowerCase()
+    
+    // 먼저 기존 키워드가 있는지 확인
+    const { data: existingKeyword } = await supabaseAdmin
       .from('keywords')
-      .upsert({
-        term: validatedData.term.trim().toLowerCase(),
-        source: 'seed',
-        depth: 0,
-        status: 'queued'
-      }, {
-        onConflict: 'term'
-      })
       .select('id')
+      .eq('term', normalizedTerm)
       .single()
-
-    if (keywordError) {
-      console.error('키워드 저장 오류:', keywordError)
-      throw new Error('키워드 저장에 실패했습니다.')
+    
+    let keywordData
+    if (existingKeyword) {
+      // 기존 키워드가 있으면 상태만 업데이트
+      const { data, error } = await supabaseAdmin
+        .from('keywords')
+        .update({
+          status: 'queued',
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', existingKeyword.id)
+        .select('id')
+        .single()
+      
+      if (error) {
+        console.error('키워드 업데이트 오류:', error)
+        throw new Error('키워드 업데이트에 실패했습니다.')
+      }
+      keywordData = data
+    } else {
+      // 새 키워드 삽입
+      const { data, error } = await supabaseAdmin
+        .from('keywords')
+        .insert({
+          term: normalizedTerm,
+          source: 'seed',
+          depth: 0,
+          status: 'queued'
+        })
+        .select('id')
+        .single()
+      
+      if (error) {
+        console.error('키워드 저장 오류:', error)
+        throw new Error('키워드 저장에 실패했습니다.')
+      }
+      keywordData = data
     }
 
     const keywordId = keywordData.id
