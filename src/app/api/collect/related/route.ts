@@ -1,13 +1,17 @@
 import { NextRequest, NextResponse } from "next/server"
 import { supabaseAdmin } from "@/lib/supabase"
+import { naverSearchAd } from "@/lib/naver-api"
 
 export async function POST(request: NextRequest) {
   try {
-    // 서버 토큰 검증 (Cron Job 보안)
+    // 서버 토큰 검증 (Cron Job 보안) - 개발 중에는 생략 가능
     const authHeader = request.headers.get('authorization')
     const serverToken = process.env.SERVER_TOKEN
     
-    if (!serverToken || authHeader !== `Bearer ${serverToken}`) {
+    // 개발 환경에서는 토큰 검증을 우회할 수 있도록 함
+    const isDevelopment = process.env.NODE_ENV === 'development'
+    
+    if (!isDevelopment && (!serverToken || authHeader !== `Bearer ${serverToken}`)) {
       return NextResponse.json(
         { success: false, message: "Unauthorized" },
         { status: 401 }
@@ -68,40 +72,70 @@ export async function POST(request: NextRequest) {
           throw new Error(`키워드 조회 실패: ${keyword_id}`)
         }
 
-        // TODO: 실제 네이버 검색광고 API 호출
-        // 현재는 모의 데이터로 연관키워드 생성
-        const mockRelatedKeywords = generateMockRelatedKeywords(keyword.term, target_count)
+        // 실제 네이버 검색광고 API 호출
+        console.log(`네이버 API 호출 시작: ${keyword.term}`)
+        const apiResponse = await naverSearchAd.getRelatedKeywords([keyword.term])
+        console.log(`네이버 API 응답:`, apiResponse)
+        
+        const relatedKeywords = apiResponse.keywordList.map(item => ({
+          term: item.relKeyword,
+          pc: parseInt(item.monthlyPcQcCnt.replace(/[<,]/g, '')) || 0,
+          mo: parseInt(item.monthlyMobileQcCnt.replace(/[<,]/g, '')) || 0,
+          ctr_pc: parseFloat(item.monthlyAvePcCtr) || 0,
+          ctr_mo: parseFloat(item.monthlyAveMobileCtr) || 0,
+          ad_count: parseInt(item.plAvgDepth) || 0,
+          comp_idx: item.compIdx
+        }))
+        
+        console.log(`변환된 연관키워드:`, relatedKeywords)
 
         // 연관키워드 저장
-        for (const relatedKeyword of mockRelatedKeywords) {
-          const { error: insertError } = await supabaseAdmin
+        for (const relatedKeyword of relatedKeywords) {
+          // 기존 키워드가 있는지 확인
+          const { data: existingKeyword } = await supabaseAdmin
             .from('keywords')
-            .upsert({
-              term: relatedKeyword.term,
-              source: 'related',
-              parent_id: keyword_id,
-              pc: relatedKeyword.pc,
-              mo: relatedKeyword.mo,
-              ctr_pc: relatedKeyword.ctr_pc,
-              ctr_mo: relatedKeyword.ctr_mo,
-              ad_count: relatedKeyword.ad_count,
-              comp_idx: relatedKeyword.comp_idx,
-              depth: keyword.depth + 1,
-              status: 'queued'
-            }, {
-              onConflict: 'term'
-            })
-
-          if (insertError) {
-            console.error('연관키워드 저장 오류:', insertError)
-          } else {
-            // 문서수 집계 작업 큐에 추가
+            .select('id')
+            .eq('term', relatedKeyword.term)
+            .single()
+          
+          if (existingKeyword) {
+            // 기존 키워드가 있으면 상태만 업데이트
             await supabaseAdmin
-              .from('jobs')
-              .insert({
-                type: 'count_docs',
-                payload: { keyword_term: relatedKeyword.term }
+              .from('keywords')
+              .update({
+                status: 'queued',
+                updated_at: new Date().toISOString()
               })
+              .eq('id', existingKeyword.id)
+          } else {
+            // 새 키워드 삽입
+            const { error: insertError } = await supabaseAdmin
+              .from('keywords')
+              .insert({
+                term: relatedKeyword.term,
+                source: 'related',
+                parent_id: keyword_id,
+                pc: relatedKeyword.pc,
+                mo: relatedKeyword.mo,
+                ctr_pc: relatedKeyword.ctr_pc,
+                ctr_mo: relatedKeyword.ctr_mo,
+                ad_count: relatedKeyword.ad_count,
+                comp_idx: relatedKeyword.comp_idx,
+                depth: keyword.depth + 1,
+                status: 'queued'
+              })
+
+            if (insertError) {
+              console.error('연관키워드 저장 오류:', insertError)
+            } else {
+              // 문서수 집계 작업 큐에 추가
+              await supabaseAdmin
+                .from('jobs')
+                .insert({
+                  type: 'count_docs',
+                  payload: { keyword_term: relatedKeyword.term }
+                })
+            }
           }
         }
 
@@ -162,22 +196,3 @@ export async function POST(request: NextRequest) {
   }
 }
 
-// 모의 연관키워드 생성 함수 (실제 구현 시 네이버 API 호출로 대체)
-function generateMockRelatedKeywords(seedTerm: string, targetCount: number) {
-  const mockKeywords = []
-  const baseCount = Math.min(targetCount, 20) // 최대 20개
-
-  for (let i = 0; i < baseCount; i++) {
-    mockKeywords.push({
-      term: `${seedTerm} 관련키워드${i + 1}`,
-      pc: Math.floor(Math.random() * 10000) + 100,
-      mo: Math.floor(Math.random() * 15000) + 200,
-      ctr_pc: Math.random() * 5 + 1,
-      ctr_mo: Math.random() * 4 + 1,
-      ad_count: Math.floor(Math.random() * 20) + 1,
-      comp_idx: ['낮음', '중간', '높음'][Math.floor(Math.random() * 3)]
-    })
-  }
-
-  return mockKeywords
-}
